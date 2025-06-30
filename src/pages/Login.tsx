@@ -28,7 +28,7 @@ const Login = () => {
           title: "Login realizado com sucesso!",
           description: "Você será redirecionado para o dashboard."
         });
-        navigate("/dashboard");
+        navigate("/");
       } else {
         toast({
           title: "Erro no login",

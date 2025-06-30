@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 
 const Cadastro = () => {
   const [userType, setUserType] = useState("pf");
-  const [isLeiloeiro, setIsLeiloeiro] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -86,15 +85,8 @@ const Cadastro = () => {
                 <div className="space-y-4">
                   <Label className="text-base font-medium">Tipo de Cadastro</Label>
                   <RadioGroup 
-                    value={isLeiloeiro ? "leiloeiro" : userType} 
-                    onValueChange={(value) => {
-                      if (value === "leiloeiro") {
-                        setIsLeiloeiro(true);
-                      } else {
-                        setIsLeiloeiro(false);
-                        setUserType(value);
-                      }
-                    }}
+                    value={userType} 
+                    onValueChange={setUserType}
                     className="grid grid-cols-1 md:grid-cols-3 gap-4"
                   >
                     <div className="flex items-center space-x-2 border rounded-lg p-4">
@@ -113,7 +105,7 @@ const Cadastro = () => {
                 </div>
 
                 {/* Formulário Pessoa Física */}
-                {!isLeiloeiro && userType === "pf" && (
+                {userType === "pf" && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-cyan-600">Dados Pessoais</h3>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -177,7 +169,7 @@ const Cadastro = () => {
                 )}
 
                 {/* Formulário Pessoa Jurídica */}
-                {!isLeiloeiro && userType === "pj" && (
+                {userType === "pj" && (
                   <div className="space-y-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-cyan-600">Dados da Empresa</h3>
@@ -294,7 +286,7 @@ const Cadastro = () => {
                 )}
 
                 {/* Formulário Leiloeiro */}
-                {isLeiloeiro && (
+                {userType === "leiloeiro" && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-orange-500">Dados do Leiloeiro</h3>
                     <div className="grid md:grid-cols-2 gap-4">
