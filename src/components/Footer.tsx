@@ -1,0 +1,101 @@
+
+import { Link } from "react-router-dom";
+import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from "lucide-react";
+
+export const Footer = () => {
+  return (
+    <footer className="bg-gray-900 text-white">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Logo e Descrição */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <img 
+                src="/lovable-uploads/92d203d9-9d17-42d8-bb69-871f1b189ba2.png" 
+                alt="Leilão em Foco" 
+                className="h-8 w-8"
+              />
+              <span className="text-xl font-bold text-cyan-400">Leilão em Foco</span>
+            </div>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Apoio estratégico para comprar e vender em leilões. Conectamos leiloeiros e arrematantes com tecnologia e expertise.
+            </p>
+          </div>
+
+          {/* Links Rápidos */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white">Links Rápidos</h3>
+            <ul className="space-y-2">
+              {[
+                { label: "Quem Somos", href: "/quem-somos" },
+                { label: "Editais", href: "/editais" },
+                { label: "Leilões", href: "/leiloes" },
+                { label: "Notícias", href: "/noticias" },
+                { label: "Cadastro", href: "/cadastro" }
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link 
+                    to={link.href} 
+                    className="text-gray-300 hover:text-cyan-400 transition-colors text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Serviços */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white">Serviços</h3>
+            <ul className="space-y-2">
+              {[
+                "Assessoria para Arrematação",
+                "Despachante",
+                "Curso de Arrematação",
+                "Marketing para Leilões",
+                "Credenciamento"
+              ].map((service) => (
+                <li key={service}>
+                  <span className="text-gray-300 text-sm">{service}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contato */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white">Contato</h3>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                <Mail className="h-4 w-4 text-cyan-400" />
+                <span className="text-gray-300 text-sm">contato@leilaoemfoco.com.br</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Phone className="h-4 w-4 text-cyan-400" />
+                <span className="text-gray-300 text-sm">(11) 9999-9999</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <MapPin className="h-4 w-4 text-cyan-400" />
+                <span className="text-gray-300 text-sm">São Paulo - SP</span>
+              </div>
+            </div>
+
+            {/* Redes Sociais */}
+            <div className="flex space-x-3 pt-2">
+              <Facebook className="h-5 w-5 text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors" />
+              <Instagram className="h-5 w-5 text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors" />
+              <Linkedin className="h-5 w-5 text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors" />
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+          <p className="text-gray-400 text-sm">
+            © 2025 Leilão em Foco. Todos os direitos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
