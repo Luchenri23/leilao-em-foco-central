@@ -20,6 +20,7 @@ export const Navigation = () => {
     { label: "Editais", href: "/editais" },
     { label: "Leilões", href: "/leiloes" },
     { label: "Notícias", href: "/noticias" },
+    { label: "Contato", href: "/contato" },
   ];
 
   const handleLogout = () => {
