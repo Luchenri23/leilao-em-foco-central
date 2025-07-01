@@ -16,6 +16,7 @@ export const Navigation = () => {
   const navigate = useNavigate();
 
   const menuItems = [
+    { label: "Home", href: "/" },
     { label: "Quem Somos", href: "/quem-somos" },
     { label: "Editais", href: "/editais" },
     { label: "Leilões", href: "/leiloes" },
@@ -39,7 +40,7 @@ export const Navigation = () => {
               alt="Leilão em Foco" 
               className="h-8 w-8"
             />
-            <span className="text-xl font-bold text-cyan-600">Leilão em Foco</span>
+            <span className="text-xl font-bold text-primary-blue">Leilão em Foco</span>
           </Link>
 
           {/* Desktop Menu */}
@@ -48,7 +49,7 @@ export const Navigation = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className="text-gray-600 hover:text-cyan-600 transition-colors"
+                className="text-neutral-gray hover:text-primary-blue transition-colors font-medium"
               >
                 {item.label}
               </Link>
@@ -60,7 +61,7 @@ export const Navigation = () => {
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white">
                     <User className="h-4 w-4 mr-2" />
                     Minha Conta
                   </Button>
@@ -80,10 +81,10 @@ export const Navigation = () => {
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" asChild className="border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white">
                   <Link to="/cadastro">Cadastre-se</Link>
                 </Button>
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className="bg-primary-blue hover:bg-primary-blue/90 text-white">
                   <Link to="/login">Login</Link>
                 </Button>
               </>
@@ -103,7 +104,7 @@ export const Navigation = () => {
                   <Link
                     key={item.href}
                     to={item.href}
-                    className="text-gray-600 hover:text-cyan-600 transition-colors p-2"
+                    className="text-neutral-gray hover:text-primary-blue transition-colors p-2 font-medium"
                   >
                     {item.label}
                   </Link>
@@ -111,19 +112,19 @@ export const Navigation = () => {
                 <div className="border-t pt-4 space-y-2">
                   {isLoggedIn ? (
                     <>
-                      <Button variant="outline" className="w-full" asChild>
+                      <Button variant="outline" className="w-full border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white" asChild>
                         <Link to="/dashboard">Dashboard</Link>
                       </Button>
-                      <Button variant="outline" className="w-full" onClick={handleLogout}>
+                      <Button variant="outline" className="w-full border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white" onClick={handleLogout}>
                         Sair
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Button variant="outline" className="w-full" asChild>
+                      <Button variant="outline" className="w-full border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white" asChild>
                         <Link to="/cadastro">Cadastre-se</Link>
                       </Button>
-                      <Button className="w-full" asChild>
+                      <Button className="w-full bg-primary-blue hover:bg-primary-blue/90 text-white" asChild>
                         <Link to="/login">Login</Link>
                       </Button>
                     </>
