@@ -107,7 +107,7 @@ const Cadastro = () => {
                 {/* Formulário Pessoa Física */}
                 {userType === "pf" && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-cyan-600">Dados Pessoais</h3>
+                    <h3 className="text-lg font-semibold text-primary-blue">Dados Pessoais</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="nome">Nome Completo</Label>
@@ -172,7 +172,7 @@ const Cadastro = () => {
                 {userType === "pj" && (
                   <div className="space-y-6">
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-cyan-600">Dados da Empresa</h3>
+                      <h3 className="text-lg font-semibold text-primary-blue">Dados da Empresa</h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="nomeFantasia">Nome Fantasia</Label>
@@ -232,7 +232,7 @@ const Cadastro = () => {
                     </div>
 
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-orange-500">Dados do Sócio Responsável</h3>
+                      <h3 className="text-lg font-semibold text-orange">Dados do Sócio Responsável</h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="nomeSocio">Nome do Sócio</Label>
@@ -288,7 +288,7 @@ const Cadastro = () => {
                 {/* Formulário Leiloeiro */}
                 {userType === "leiloeiro" && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-orange-500">Dados do Leiloeiro</h3>
+                    <h3 className="text-lg font-semibold text-orange">Dados do Leiloeiro</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="nomeLeiloeiro">Nome/Razão Social</Label>
@@ -350,7 +350,7 @@ const Cadastro = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full bg-primary-blue hover:bg-primary-blue/90 text-white" 
                   disabled={isLoading}
                   size="lg"
                 >
@@ -359,11 +359,11 @@ const Cadastro = () => {
               </form>
 
               <div className="mt-6 text-center">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-neutral-gray">
                   Já tem uma conta?{" "}
                   <Link 
                     to="/login" 
-                    className="text-cyan-600 hover:text-cyan-700 font-medium"
+                    className="text-primary-blue hover:text-primary-blue/80 font-medium"
                   >
                     Faça login aqui
                   </Link>

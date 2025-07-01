@@ -80,7 +80,7 @@ const Login = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full bg-primary-blue hover:bg-primary-blue/90 text-white" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
@@ -90,16 +90,16 @@ const Login = () => {
               <div className="mt-6 text-center space-y-2">
                 <Link 
                   to="/esqueci-senha" 
-                  className="text-sm text-cyan-600 hover:text-cyan-700"
+                  className="text-sm text-primary-blue hover:text-primary-blue/80"
                 >
                   Esqueci minha senha
                 </Link>
                 
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-neutral-gray">
                   Não tem uma conta?{" "}
                   <Link 
                     to="/cadastro" 
-                    className="text-cyan-600 hover:text-cyan-700 font-medium"
+                    className="text-primary-blue hover:text-primary-blue/80 font-medium"
                   >
                     Cadastre-se aqui
                   </Link>
