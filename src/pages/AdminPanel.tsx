@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { AdminLeilaoForm } from "@/components/AdminLeilaoForm";
 import { AdminConfigForm } from "@/components/AdminConfigForm";
 import { AdminChat } from "@/components/AdminChat";
 import { ServicesManager } from "@/components/ServicesManager";
+import { AdminManagement } from "@/components/AdminManagement";
 import { 
   Users, 
   UserCheck, 
@@ -31,7 +33,8 @@ import {
   MessageSquare,
   Briefcase,
   Image,
-  Globe
+  Globe,
+  Shield
 } from "lucide-react";
 
 const AdminPanel = () => {
@@ -215,13 +218,14 @@ const AdminPanel = () => {
 
         {/* Tabs do Painel Admin */}
         <Tabs defaultValue="usuarios" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="usuarios">Usuários</TabsTrigger>
             <TabsTrigger value="leiloes">Leilões</TabsTrigger>
             <TabsTrigger value="servicos">Serviços</TabsTrigger>
             <TabsTrigger value="chat">Chat</TabsTrigger>
             <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
             <TabsTrigger value="configuracoes">Config</TabsTrigger>
+            <TabsTrigger value="administradores">Admins</TabsTrigger>
             <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
           </TabsList>
 
@@ -464,6 +468,10 @@ const AdminPanel = () => {
 
           <TabsContent value="configuracoes">
             <AdminConfigForm />
+          </TabsContent>
+
+          <TabsContent value="administradores">
+            <AdminManagement />
           </TabsContent>
 
           <TabsContent value="relatorios">
