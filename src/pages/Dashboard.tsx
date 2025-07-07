@@ -1,18 +1,22 @@
-
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { WhatsappFloat } from "@/components/WhatsappFloat";
 import { LeiloeiroPanel } from "@/components/LeiloeiroPanel";
+import { UserLeilaoForm } from "@/components/UserLeilaoForm";
+import { UserServices } from "@/components/UserServices";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Gavel, Heart, User, Bell, FileText } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Clock, Gavel, Heart, User, Bell, FileText, Plus } from "lucide-react";
 
 const Dashboard = () => {
   // Simular tipo de usuário logado - pode vir do contexto de autenticação
-  const [userType] = useState("leiloeiro"); // "pf", "pj", "leiloeiro"
+  const [userType] = useState("Pessoa Física"); // "Pessoa Física", "Pessoa Jurídica", "leiloeiro"
+  const [showLeilaoForm, setShowLeilaoForm] = useState(false);
 
   const mockLeiloes = [
     {
@@ -53,9 +57,9 @@ const Dashboard = () => {
     switch (userType) {
       case "leiloeiro":
         return <LeiloeiroPanel />;
-      case "pj":
+      case "Pessoa Jurídica":
         return renderPJContent();
-      case "pf":
+      case "Pessoa Física":
       default:
         return renderPFContent();
     }
@@ -108,9 +112,11 @@ const Dashboard = () => {
 
       {/* Tabs do Dashboard PF */}
       <Tabs defaultValue="leiloes" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="leiloes">Meus Leilões</TabsTrigger>
           <TabsTrigger value="favoritos">Favoritos</TabsTrigger>
+          <TabsTrigger value="criar">Criar/Solicitar</TabsTrigger>
+          <TabsTrigger value="servicos">Serviços</TabsTrigger>
           <TabsTrigger value="perfil">Perfil</TabsTrigger>
           <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
@@ -175,6 +181,54 @@ const Dashboard = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="criar">
+          {showLeilaoForm ? (
+            <UserLeilaoForm 
+              onClose={() => setShowLeilaoForm(false)}
+              userType={userType}
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Solicitar Leilão</CardTitle>
+                  <CardDescription>
+                    Solicite a criação de um leilão para seus itens
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setShowLeilaoForm(true)}
+                    className="w-full bg-primary-blue hover:bg-primary-blue/90 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Solicitação
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Criar Edital</CardTitle>
+                  <CardDescription>
+                    Publique um edital para seus leilões
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Criar Edital
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="servicos">
+          <UserServices userType={userType} />
+        </TabsContent>
+
         <TabsContent value="perfil">
           <Card>
             <CardHeader>
@@ -186,24 +240,24 @@ const Dashboard = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Nome Completo</label>
-                  <p className="text-neutral-gray">João Silva Santos</p>
+                  <Label>Nome Completo</Label>
+                  <Input value="João Silva Santos" readOnly />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">E-mail</label>
-                  <p className="text-neutral-gray">joao@email.com</p>
+                  <Label>E-mail</Label>
+                  <Input value="joao@email.com" readOnly />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Telefone</label>
-                  <p className="text-neutral-gray">(11) 99999-9999</p>
+                  <Label>Telefone</Label>
+                  <Input value="(11) 99999-9999" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">CPF</label>
-                  <p className="text-neutral-gray">***.***.***-**</p>
+                  <Label>CPF</Label>
+                  <Input value="***.***.***-**" readOnly />
                 </div>
               </div>
               <Button className="bg-primary-blue hover:bg-primary-blue/90 text-white">
-                Editar Perfil
+                Salvar Alterações
               </Button>
             </CardContent>
           </Card>
@@ -293,17 +347,77 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Painel Pessoa Jurídica</CardTitle>
-          <CardDescription>
-            Funcionalidades específicas para empresas
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-neutral-gray">Dashboard específico para Pessoa Jurídica em desenvolvimento...</p>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="leiloes" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="leiloes">Leilões</TabsTrigger>
+          <TabsTrigger value="criar">Criar</TabsTrigger>
+          <TabsTrigger value="servicos">Serviços</TabsTrigger>
+          <TabsTrigger value="perfil">Perfil</TabsTrigger>
+          <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="servicos">
+          <UserServices userType={userType} />
+        </TabsContent>
+
+        <TabsContent value="criar">
+          {showLeilaoForm ? (
+            <UserLeilaoForm 
+              onClose={() => setShowLeilaoForm(false)}
+              userType={userType}
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Solicitar Leilão Corporativo</CardTitle>
+                  <CardDescription>
+                    Solicite leilões para ativos da empresa
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setShowLeilaoForm(true)}
+                    className="w-full bg-primary-blue hover:bg-primary-blue/90 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Solicitação
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Relatórios Personalizados</CardTitle>
+                  <CardDescription>
+                    Gere relatórios de suas atividades
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Gerar Relatório
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="leiloes">
+          <Card>
+            <CardHeader>
+              <CardTitle>Painel Pessoa Jurídica</CardTitle>
+              <CardDescription>
+                Funcionalidades específicas para empresas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-gray">Dashboard específico para Pessoa Jurídica em desenvolvimento...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 
@@ -314,11 +428,11 @@ const Dashboard = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-primary-blue mb-2">
             {userType === "leiloeiro" ? "Painel do Leiloeiro" : 
-             userType === "pj" ? "Dashboard Corporativo" : "Meu Dashboard"}
+             userType === "Pessoa Jurídica" ? "Dashboard Corporativo" : "Meu Dashboard"}
           </h1>
           <p className="text-neutral-gray">
             {userType === "leiloeiro" ? "Gerencie seus leilões e participantes" :
-             userType === "pj" ? "Controle empresarial de leilões" : "Bem-vindo ao seu painel de controle"}
+             userType === "Pessoa Jurídica" ? "Controle empresarial de leilões" : "Bem-vindo ao seu painel de controle"}
           </p>
         </div>
 

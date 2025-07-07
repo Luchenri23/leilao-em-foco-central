@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { AdminUserForm } from "@/components/AdminUserForm";
+import { AdminLeilaoForm } from "@/components/AdminLeilaoForm";
+import { AdminConfigForm } from "@/components/AdminConfigForm";
+import { AdminChat } from "@/components/AdminChat";
+import { ServicesManager } from "@/components/ServicesManager";
 import { 
   Users, 
   UserCheck, 
@@ -20,13 +24,23 @@ import {
   Eye,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Plus,
+  Edit,
+  Trash2,
+  MessageSquare,
+  Briefcase,
+  Image,
+  Globe
 } from "lucide-react";
 
 const AdminPanel = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [showLeilaoForm, setShowLeilaoForm] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
   // Mock data para usuários pendentes
   const [pendingUsers, setPendingUsers] = useState([
@@ -111,6 +125,28 @@ const AdminPanel = () => {
     }
   };
 
+  if (showUserForm) {
+    return (
+      <div className="min-h-screen bg-background p-8">
+        <AdminUserForm 
+          onClose={() => {
+            setShowUserForm(false);
+            setEditingUser(null);
+          }}
+          editingUser={editingUser}
+        />
+      </div>
+    );
+  }
+
+  if (showLeilaoForm) {
+    return (
+      <div className="min-h-screen bg-background p-8">
+        <AdminLeilaoForm onClose={() => setShowLeilaoForm(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header do Admin */}
@@ -179,20 +215,32 @@ const AdminPanel = () => {
 
         {/* Tabs do Painel Admin */}
         <Tabs defaultValue="usuarios" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="usuarios">Gerenciar Usuários</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="usuarios">Usuários</TabsTrigger>
             <TabsTrigger value="leiloes">Leilões</TabsTrigger>
+            <TabsTrigger value="servicos">Serviços</TabsTrigger>
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
+            <TabsTrigger value="configuracoes">Config</TabsTrigger>
             <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
-            <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="usuarios">
             <Card>
-              <CardHeader>
-                <CardTitle>Aprovação de Usuários</CardTitle>
-                <CardDescription>
-                  Gerencie e aprove novos cadastros na plataforma
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Gerenciar Usuários</CardTitle>
+                  <CardDescription>
+                    Gerencie e aprove novos cadastros na plataforma
+                  </CardDescription>
+                </div>
+                <Button 
+                  onClick={() => setShowUserForm(true)}
+                  className="bg-primary-blue hover:bg-primary-blue/90 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Usuário
+                </Button>
               </CardHeader>
               <CardContent>
                 {/* Filtros */}
@@ -268,6 +316,16 @@ const AdminPanel = () => {
                               <Button size="sm" variant="outline">
                                 <Eye className="h-3 w-3" />
                               </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingUser(user);
+                                  setShowUserForm(true);
+                                }}
+                              >
+                                <Edit className="h-3 w-3" />
+                              </Button>
                               {user.status === "pendente" && (
                                 <>
                                   <Button 
@@ -286,6 +344,9 @@ const AdminPanel = () => {
                                   </Button>
                                 </>
                               )}
+                              <Button size="sm" variant="destructive">
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -299,16 +360,110 @@ const AdminPanel = () => {
 
           <TabsContent value="leiloes">
             <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Gerenciamento de Leilões</CardTitle>
+                  <CardDescription>
+                    Controle todos os leilões, lotes e editais da plataforma
+                  </CardDescription>
+                </div>
+                <Button 
+                  onClick={() => setShowLeilaoForm(true)}
+                  className="bg-primary-blue hover:bg-primary-blue/90 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Leilão
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Leilões Ativos</p>
+                          <p className="text-2xl font-bold text-primary-blue">8</p>
+                        </div>
+                        <Gavel className="h-8 w-8 text-primary-blue" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Total de Lotes</p>
+                          <p className="text-2xl font-bold text-orange">156</p>
+                        </div>
+                        <FileText className="h-8 w-8 text-orange" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Editais Publicados</p>
+                          <p className="text-2xl font-bold text-secondary-blue">24</p>
+                        </div>
+                        <FileText className="h-8 w-8 text-secondary-blue" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <p className="text-neutral-gray">Funcionalidade de listagem de leilões em desenvolvimento...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="servicos">
+            <ServicesManager />
+          </TabsContent>
+
+          <TabsContent value="chat">
+            <Card>
               <CardHeader>
-                <CardTitle>Gerenciamento de Leilões</CardTitle>
+                <CardTitle>Chat com Usuários</CardTitle>
                 <CardDescription>
-                  Controle todos os leilões da plataforma
+                  Converse diretamente com os usuários da plataforma
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-neutral-gray">Funcionalidade em desenvolvimento...</p>
+                <AdminChat />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="conteudo">
+            <Card>
+              <CardHeader>
+                <CardTitle>Gerenciar Conteúdo</CardTitle>
+                <CardDescription>
+                  Gerencie páginas, textos e banners do site
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <Button variant="outline" className="h-20 flex flex-col">
+                    <Globe className="h-6 w-6 mb-2" />
+                    <span>Criar Página</span>
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col">
+                    <FileText className="h-6 w-6 mb-2" />
+                    <span>Editar Textos</span>
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col">
+                    <Image className="h-6 w-6 mb-2" />
+                    <span>Gerenciar Banners</span>
+                  </Button>
+                </div>
+                <p className="text-neutral-gray">Funcionalidades de gerenciamento de conteúdo em desenvolvimento...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="configuracoes">
+            <AdminConfigForm />
           </TabsContent>
 
           <TabsContent value="relatorios">
@@ -317,20 +472,6 @@ const AdminPanel = () => {
                 <CardTitle>Relatórios e Análises</CardTitle>
                 <CardDescription>
                   Visualize estatísticas e gere relatórios
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-neutral-gray">Funcionalidade em desenvolvimento...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="configuracoes">
-            <Card>
-              <CardHeader>
-                <CardTitle>Configurações do Sistema</CardTitle>
-                <CardDescription>
-                  Configure parâmetros gerais da plataforma
                 </CardDescription>
               </CardHeader>
               <CardContent>
