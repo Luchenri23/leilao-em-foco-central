@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
+import Dashboard from "./pages/Dashboard";
+import AdminPanel from "./pages/AdminPanel";
 import QuemSomos from "./pages/QuemSomos";
 import Editais from "./pages/Editais";
 import Leiloes from "./pages/Leiloes";
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/painel" element={<AdminPanel />} />
           <Route path="/quem-somos" element={<QuemSomos />} />
           <Route path="/editais" element={<Editais />} />
           <Route path="/leiloes" element={<Leiloes />} />
