@@ -3,6 +3,14 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from "lucide-react";
 
 export const Footer = () => {
+  // Mock data - em uma implementação real, isso viria das configurações do admin
+  const socialMediaConfig = {
+    facebook: { enabled: true, url: "https://facebook.com/leilaoemfoco" },
+    instagram: { enabled: true, url: "https://instagram.com/leilaoemfoco" },
+    linkedin: { enabled: true, url: "https://linkedin.com/company/leilaoemfoco" },
+    twitter: { enabled: false, url: "" }
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -81,11 +89,38 @@ export const Footer = () => {
               </div>
             </div>
 
-            {/* Redes Sociais */}
+            {/* Redes Sociais - Configuráveis pelo Admin */}
             <div className="flex space-x-3 pt-2">
-              <Facebook className="h-5 w-5 text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors" />
-              <Instagram className="h-5 w-5 text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors" />
-              <Linkedin className="h-5 w-5 text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors" />
+              {socialMediaConfig.facebook.enabled && (
+                <a 
+                  href={socialMediaConfig.facebook.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors"
+                >
+                  <Facebook className="h-5 w-5" />
+                </a>
+              )}
+              {socialMediaConfig.instagram.enabled && (
+                <a 
+                  href={socialMediaConfig.instagram.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors"
+                >
+                  <Instagram className="h-5 w-5" />
+                </a>
+              )}
+              {socialMediaConfig.linkedin.enabled && (
+                <a 
+                  href={socialMediaConfig.linkedin.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-cyan-400 cursor-pointer transition-colors"
+                >
+                  <Linkedin className="h-5 w-5" />
+                </a>
+              )}
             </div>
           </div>
         </div>

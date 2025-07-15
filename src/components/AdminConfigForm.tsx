@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Image } from "lucide-react";
+import { Upload, Image, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
 export const AdminConfigForm = () => {
   const { toast } = useToast();
@@ -19,7 +19,18 @@ export const AdminConfigForm = () => {
     address: "Rua das Flores, 123 - São Paulo/SP",
     bannerTitle: "Participe dos Melhores Leilões",
     bannerSubtitle: "Encontre oportunidades únicas em nossa plataforma",
-    servicesEmail: "servicos@leilaoemfoco.com.br"
+    servicesEmail: "servicos@leilaoemfoco.com.br",
+    // Redes Sociais
+    facebookUrl: "https://facebook.com/leilaoemfoco",
+    instagramUrl: "https://instagram.com/leilaoemfoco",
+    linkedinUrl: "https://linkedin.com/company/leilaoemfoco",
+    twitterUrl: "https://twitter.com/leilaoemfoco",
+    socialMediaEnabled: {
+      facebook: true,
+      instagram: true,
+      linkedin: true,
+      twitter: false
+    }
   });
 
   const handleSave = () => {
@@ -33,6 +44,16 @@ export const AdminConfigForm = () => {
     toast({
       title: "Upload realizado!",
       description: "Nova imagem do banner foi carregada com sucesso."
+    });
+  };
+
+  const toggleSocialMedia = (platform: string) => {
+    setConfig({
+      ...config,
+      socialMediaEnabled: {
+        ...config.socialMediaEnabled,
+        [platform]: !config.socialMediaEnabled[platform as keyof typeof config.socialMediaEnabled]
+      }
     });
   };
 
@@ -150,6 +171,111 @@ export const AdminConfigForm = () => {
                 Fazer Upload
               </Button>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Redes Sociais</CardTitle>
+          <CardDescription>Configure os links das redes sociais que aparecerão no rodapé</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="facebook-enabled"
+                  checked={config.socialMediaEnabled.facebook}
+                  onChange={() => toggleSocialMedia('facebook')}
+                  className="rounded"
+                />
+                <Facebook className="h-5 w-5 text-blue-600" />
+                <Label htmlFor="facebook-enabled">Facebook</Label>
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="https://facebook.com/sua-empresa"
+                  value={config.facebookUrl}
+                  onChange={(e) => setConfig({...config, facebookUrl: e.target.value})}
+                  disabled={!config.socialMediaEnabled.facebook}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="instagram-enabled"
+                  checked={config.socialMediaEnabled.instagram}
+                  onChange={() => toggleSocialMedia('instagram')}
+                  className="rounded"
+                />
+                <Instagram className="h-5 w-5 text-pink-600" />
+                <Label htmlFor="instagram-enabled">Instagram</Label>
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="https://instagram.com/sua-empresa"
+                  value={config.instagramUrl}
+                  onChange={(e) => setConfig({...config, instagramUrl: e.target.value})}
+                  disabled={!config.socialMediaEnabled.instagram}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="linkedin-enabled"
+                  checked={config.socialMediaEnabled.linkedin}
+                  onChange={() => toggleSocialMedia('linkedin')}
+                  className="rounded"
+                />
+                <Linkedin className="h-5 w-5 text-blue-700" />
+                <Label htmlFor="linkedin-enabled">LinkedIn</Label>
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="https://linkedin.com/company/sua-empresa"
+                  value={config.linkedinUrl}
+                  onChange={(e) => setConfig({...config, linkedinUrl: e.target.value})}
+                  disabled={!config.socialMediaEnabled.linkedin}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="twitter-enabled"
+                  checked={config.socialMediaEnabled.twitter}
+                  onChange={() => toggleSocialMedia('twitter')}
+                  className="rounded"
+                />
+                <Twitter className="h-5 w-5 text-blue-400" />
+                <Label htmlFor="twitter-enabled">Twitter/X</Label>
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="https://twitter.com/sua-empresa"
+                  value={config.twitterUrl}
+                  onChange={(e) => setConfig({...config, twitterUrl: e.target.value})}
+                  disabled={!config.socialMediaEnabled.twitter}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Dica:</strong> As redes sociais habilitadas aparecerão automaticamente no rodapé do site. 
+              Certifique-se de que os links estão corretos e ativos.
+            </p>
           </div>
         </CardContent>
       </Card>
