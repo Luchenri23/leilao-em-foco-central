@@ -1,34 +1,27 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ContentEditor } from "@/components/ContentEditor";
+import { BannerManager } from "@/components/BannerManager";
 import { Globe, FileText, Image } from "lucide-react";
 
 export const ContentManagement = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Gerenciar Conteúdo</CardTitle>
-        <CardDescription>
-          Gerencie páginas, textos e banners do site
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Button variant="outline" className="h-20 flex flex-col">
-            <Globe className="h-6 w-6 mb-2" />
-            <span>Criar Página</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex flex-col">
-            <FileText className="h-6 w-6 mb-2" />
-            <span>Editar Textos</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex flex-col">
-            <Image className="h-6 w-6 mb-2" />
-            <span>Gerenciar Banners</span>
-          </Button>
-        </div>
-        <p className="text-neutral-gray">Funcionalidades de gerenciamento de conteúdo em desenvolvimento...</p>
-      </CardContent>
-    </Card>
+    <Tabs defaultValue="content" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="content">Conteúdo e Páginas</TabsTrigger>
+        <TabsTrigger value="banners">Banners</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="content">
+        <ContentEditor />
+      </TabsContent>
+
+      <TabsContent value="banners">
+        <BannerManager />
+      </TabsContent>
+    </Tabs>
   );
 };
