@@ -1,125 +1,91 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminHeader } from "@/components/AdminHeader";
 import { AdminStats } from "@/components/AdminStats";
 import { UserManagement } from "@/components/UserManagement";
-import { LeilaoManagement } from "@/components/LeilaoManagement";
-import { ContentManagement } from "@/components/ContentManagement";
-import { ReportsSection } from "@/components/ReportsSection";
+import { AuctionManagement } from "@/components/AuctionManagement";
+import { ContentManagementFull } from "@/components/ContentManagementFull";
+import { BannerManagementFull } from "@/components/BannerManagementFull";
 import { AdminConfigForm } from "@/components/AdminConfigForm";
 import { AdminChat } from "@/components/AdminChat";
-import { ServicesManager } from "@/components/ServicesManager";
-import { AdminManagement } from "@/components/AdminManagement";
+import { ReportsSection } from "@/components/ReportsSection";
+import { 
+  Users, 
+  Gavel, 
+  FileText, 
+  Image, 
+  Settings, 
+  MessageSquare, 
+  BarChart3,
+  Home
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const AdminPanel = () => {
-  const [showLeilaoForm, setShowLeilaoForm] = useState(false);
+  const [activeSection, setActiveSection] = useState("dashboard");
 
-  // Mock data para usuários pendentes
-  const [pendingUsers, setPendingUsers] = useState([
-    {
-      id: 1,
-      nome: "João Silva Santos",
-      email: "joao@email.com",
-      tipo: "Pessoa Física",
-      telefone: "(11) 99999-9999",
-      documento: "123.456.789-00",
-      dataCadastro: "2024-07-05",
-      status: "pendente"
-    },
-    {
-      id: 2,
-      nome: "Empresa ABC Ltda",
-      email: "contato@empresaabc.com",
-      tipo: "Pessoa Jurídica",
-      telefone: "(11) 88888-8888",
-      documento: "12.345.678/0001-90",
-      dataCadastro: "2024-07-06",
-      status: "pendente"
-    },
-    {
-      id: 3,
-      nome: "Carlos Leiloeiro",
-      email: "carlos@leiloeiro.com",
-      tipo: "Leiloeiro",
-      telefone: "(11) 77777-7777",
-      documento: "JC-SP 12345",
-      dataCadastro: "2024-07-07",
-      status: "pendente"
+  const menuItems = [
+    { id: "dashboard", label: "Dashboard", icon: Home },
+    { id: "users", label: "Usuários", icon: Users },
+    { id: "auctions", label: "Leilões", icon: Gavel },
+    { id: "content", label: "Conteúdo", icon: FileText },
+    { id: "banners", label: "Banners", icon: Image },
+    { id: "chat", label: "Chat", icon: MessageSquare },
+    { id: "reports", label: "Relatórios", icon: BarChart3 },
+    { id: "settings", label: "Configurações", icon: Settings },
+  ];
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case "dashboard":
+        return <AdminStats />;
+      case "users":
+        return <UserManagement />;
+      case "auctions":
+        return <AuctionManagement />;
+      case "content":
+        return <ContentManagementFull />;
+      case "banners":
+        return <BannerManagementFull />;
+      case "chat":
+        return <AdminChat />;
+      case "reports":
+        return <ReportsSection />;
+      case "settings":
+        return <AdminConfigForm />;
+      default:
+        return <AdminStats />;
     }
-  ]);
-
-  const pendingUsersCount = pendingUsers.filter(u => u.status === "pendente").length;
+  };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <AdminHeader />
+      
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-sm border-r min-h-screen">
+          <nav className="p-4">
+            <div className="space-y-2">
+              {menuItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={activeSection === item.id ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection(item.id)}
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </Button>
+              ))}
+            </div>
+          </nav>
+        </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <AdminStats pendingUsersCount={pendingUsersCount} />
-
-        {/* Tabs do Painel Admin */}
-        <Tabs defaultValue="usuarios" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="usuarios">Usuários</TabsTrigger>
-            <TabsTrigger value="leiloes">Leilões</TabsTrigger>
-            <TabsTrigger value="servicos">Serviços</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-            <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
-            <TabsTrigger value="configuracoes">Config</TabsTrigger>
-            <TabsTrigger value="administradores">Admins</TabsTrigger>
-            <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="usuarios">
-            <UserManagement 
-              pendingUsers={pendingUsers} 
-              setPendingUsers={setPendingUsers} 
-            />
-          </TabsContent>
-
-          <TabsContent value="leiloes">
-            <LeilaoManagement 
-              showLeilaoForm={showLeilaoForm}
-              setShowLeilaoForm={setShowLeilaoForm}
-            />
-          </TabsContent>
-
-          <TabsContent value="servicos">
-            <ServicesManager />
-          </TabsContent>
-
-          <TabsContent value="chat">
-            <Card>
-              <CardHeader>
-                <CardTitle>Chat com Usuários</CardTitle>
-                <CardDescription>
-                  Converse diretamente com os usuários da plataforma
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AdminChat />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="conteudo">
-            <ContentManagement />
-          </TabsContent>
-
-          <TabsContent value="configuracoes">
-            <AdminConfigForm />
-          </TabsContent>
-
-          <TabsContent value="administradores">
-            <AdminManagement />
-          </TabsContent>
-
-          <TabsContent value="relatorios">
-            <ReportsSection />
-          </TabsContent>
-        </Tabs>
+        {/* Main Content */}
+        <div className="flex-1 p-8">
+          {renderContent()}
+        </div>
       </div>
     </div>
   );
