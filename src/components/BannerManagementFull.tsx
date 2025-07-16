@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit2, Trash2, Eye, Upload, Image } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, Upload, Image, AlertCircle, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Banner {
@@ -25,6 +25,45 @@ interface Banner {
   createdAt: string;
   updatedAt: string;
 }
+
+interface BannerSpecs {
+  position: string;
+  dimensions: string;
+  maxSize: string;
+  formats: string[];
+  notes: string;
+}
+
+const bannerSpecifications: BannerSpecs[] = [
+  {
+    position: "Hero (Principal da Home)",
+    dimensions: "1920x600px",
+    maxSize: "500KB",
+    formats: ["JPG", "PNG", "WebP"],
+    notes: "Imagem principal da página inicial. Resolução mínima 1200x400px para dispositivos móveis."
+  },
+  {
+    position: "Sidebar (Lateral)",
+    dimensions: "300x250px",
+    maxSize: "200KB",
+    formats: ["JPG", "PNG"],
+    notes: "Banner lateral que aparece na barra lateral do site."
+  },
+  {
+    position: "Rodapé",
+    dimensions: "728x90px",
+    maxSize: "150KB",
+    formats: ["JPG", "PNG"],
+    notes: "Banner horizontal no rodapé do site."
+  },
+  {
+    position: "Popup",
+    dimensions: "600x400px",
+    maxSize: "300KB",
+    formats: ["JPG", "PNG"],
+    notes: "Banner para popup promocional. Deve ter boa legibilidade."
+  }
+];
 
 export const BannerManagementFull = () => {
   const { toast } = useToast();
@@ -56,6 +95,7 @@ export const BannerManagementFull = () => {
   ]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showSpecs, setShowSpecs] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -157,6 +197,13 @@ export const BannerManagementFull = () => {
     }
   };
 
+  const getSelectedSpec = () => {
+    return bannerSpecifications.find(spec => 
+      spec.position.includes(formData.position) || 
+      spec.position.toLowerCase().includes(formData.position.toLowerCase())
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -165,146 +212,209 @@ export const BannerManagementFull = () => {
           <p className="text-gray-600">Gerencie todos os banners e imagens promocionais do site</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Banner
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingBanner ? "Editar Banner" : "Criar Novo Banner"}
-              </DialogTitle>
-              <DialogDescription>
-                Configure as informações do banner abaixo.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <Label htmlFor="title">Título do Banner</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Ex: Banner Principal - Leilões"
-                    required
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="description">Descrição</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Descreva o banner..."
-                    rows={3}
-                    required
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="image">Imagem do Banner</Label>
-                  <div className="space-y-2">
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowSpecs(true)}>
+            <FileImage className="h-4 w-4 mr-2" />
+            Especificações
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Banner
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingBanner ? "Editar Banner" : "Criar Novo Banner"}
+                </DialogTitle>
+                <DialogDescription>
+                  Configure as informações do banner abaixo.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label htmlFor="title">Título do Banner</Label>
                     <Input
-                      id="imageFile"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="Ex: Banner Principal - Leilões"
+                      required
                     />
-                    <div className="flex space-x-2">
-                      <Input
-                        value={formData.imageUrl}
-                        onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                        placeholder="URL da imagem ou faça upload"
-                        required
-                      />
-                      <Button 
-                        type="button" 
-                        variant="outline"
-                        onClick={() => document.getElementById('imageFile')?.click()}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload
-                      </Button>
-                    </div>
-                    {formData.imageUrl && (
-                      <div className="mt-2">
-                        <img 
-                          src={formData.imageUrl} 
-                          alt="Preview" 
-                          className="max-w-full h-32 object-cover rounded border"
-                        />
+                  </div>
+                  
+                  <div className="col-span-2">
+                    <Label htmlFor="description">Descrição</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Descreva o banner..."
+                      rows={3}
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="position">Posição</Label>
+                    <Select value={formData.position} onValueChange={(value: "Hero" | "Sidebar" | "Rodapé" | "Popup") => setFormData(prev => ({ ...prev, position: value }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Hero">Hero (Principal)</SelectItem>
+                        <SelectItem value="Sidebar">Sidebar (Lateral)</SelectItem>
+                        <SelectItem value="Rodapé">Rodapé</SelectItem>
+                        <SelectItem value="Popup">Popup</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="priority">Prioridade</Label>
+                    <Input
+                      id="priority"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={formData.priority}
+                      onChange={(e) => setFormData(prev => ({ ...prev, priority: Number(e.target.value) }))}
+                      required
+                    />
+                  </div>
+
+                  {/* Banner Specifications Alert */}
+                  {getSelectedSpec() && (
+                    <div className="col-span-2">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-2">
+                          <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+                          <div className="space-y-1">
+                            <h4 className="font-medium text-blue-900">Especificações para {getSelectedSpec()?.position}</h4>
+                            <div className="text-sm text-blue-700 space-y-1">
+                              <p><strong>Dimensões:</strong> {getSelectedSpec()?.dimensions}</p>
+                              <p><strong>Tamanho máximo:</strong> {getSelectedSpec()?.maxSize}</p>
+                              <p><strong>Formatos:</strong> {getSelectedSpec()?.formats.join(", ")}</p>
+                              <p><strong>Observações:</strong> {getSelectedSpec()?.notes}</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    )}
+                    </div>
+                  )}
+                  
+                  <div className="col-span-2">
+                    <Label htmlFor="image">Imagem do Banner</Label>
+                    <div className="space-y-2">
+                      <Input
+                        id="imageFile"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <div className="flex space-x-2">
+                        <Input
+                          value={formData.imageUrl}
+                          onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                          placeholder="URL da imagem ou faça upload"
+                          required
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline"
+                          onClick={() => document.getElementById('imageFile')?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload
+                        </Button>
+                      </div>
+                      {formData.imageUrl && (
+                        <div className="mt-2">
+                          <img 
+                            src={formData.imageUrl} 
+                            alt="Preview" 
+                            className="max-w-full h-32 object-cover rounded border"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="col-span-2">
+                    <Label htmlFor="linkUrl">Link de Destino</Label>
+                    <Input
+                      id="linkUrl"
+                      value={formData.linkUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, linkUrl: e.target.value }))}
+                      placeholder="/leiloes ou https://exemplo.com"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="isActive"
+                      checked={formData.isActive}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
+                    />
+                    <Label htmlFor="isActive">Banner Ativo</Label>
                   </div>
                 </div>
                 
-                <div>
-                  <Label htmlFor="linkUrl">Link de Destino</Label>
-                  <Input
-                    id="linkUrl"
-                    value={formData.linkUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, linkUrl: e.target.value }))}
-                    placeholder="/leiloes ou https://exemplo.com"
-                  />
+                <div className="flex justify-end space-x-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit">
+                    {editingBanner ? "Atualizar" : "Criar"} Banner
+                  </Button>
                 </div>
-                
-                <div>
-                  <Label htmlFor="position">Posição</Label>
-                  <Select value={formData.position} onValueChange={(value: any) => setFormData(prev => ({ ...prev, position: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Hero">Hero (Principal)</SelectItem>
-                      <SelectItem value="Sidebar">Sidebar (Lateral)</SelectItem>
-                      <SelectItem value="Rodapé">Rodapé</SelectItem>
-                      <SelectItem value="Popup">Popup</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="priority">Prioridade</Label>
-                  <Input
-                    id="priority"
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={formData.priority}
-                    onChange={(e) => setFormData(prev => ({ ...prev, priority: Number(e.target.value) }))}
-                    required
-                  />
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="isActive"
-                    checked={formData.isActive}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
-                  />
-                  <Label htmlFor="isActive">Banner Ativo</Label>
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit">
-                  {editingBanner ? "Atualizar" : "Criar"} Banner
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
+
+      {/* Banner Specifications Dialog */}
+      <Dialog open={showSpecs} onOpenChange={setShowSpecs}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Especificações Técnicas dos Banners</DialogTitle>
+            <DialogDescription>
+              Consulte as especificações técnicas para cada posição de banner
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {bannerSpecifications.map((spec, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{spec.position}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <strong>Dimensões:</strong> {spec.dimensions}
+                    </div>
+                    <div>
+                      <strong>Tamanho máximo:</strong> {spec.maxSize}
+                    </div>
+                    <div>
+                      <strong>Formatos aceitos:</strong> {spec.formats.join(", ")}
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <strong>Observações:</strong> {spec.notes}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
@@ -397,7 +507,6 @@ export const BannerManagementFull = () => {
                       <Switch
                         checked={banner.isActive}
                         onCheckedChange={() => toggleBannerStatus(banner.id)}
-                        size="sm"
                       />
                       <span className="text-sm">
                         {banner.isActive ? "Ativo" : "Inativo"}

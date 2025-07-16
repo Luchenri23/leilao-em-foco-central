@@ -7,22 +7,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Clock, MapPin, Plus, Edit2, Trash2, Eye } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, Calendar, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Auction {
   id: number;
   title: string;
   description: string;
-  date: string;
-  time: string;
-  location: string;
+  startDate: string;
+  endDate: string;
+  startingBid: number;
+  currentBid: number;
   status: "Rascunho" | "Publicado" | "Em Andamento" | "Finalizado";
-  auctioneer: string;
-  totalLots: number;
-  estimatedValue: number;
+  category: string;
+  images: string[];
+  bidsCount: number;
+  createdAt: string;
 }
 
 export const AuctionManagement = () => {
@@ -30,27 +33,31 @@ export const AuctionManagement = () => {
   const [auctions, setAuctions] = useState<Auction[]>([
     {
       id: 1,
-      title: "Leilão de Veículos - São Paulo",
-      description: "Mais de 200 veículos diversos, incluindo carros, motos e caminhões.",
-      date: "2025-01-15",
-      time: "14:00",
-      location: "São Paulo - SP",
-      status: "Publicado",
-      auctioneer: "Leiloeiro São Paulo LTDA",
-      totalLots: 215,
-      estimatedValue: 2500000
+      title: "Casa em Condomínio - São Paulo",
+      description: "Linda casa com 3 quartos, 2 banheiros, garagem para 2 carros",
+      startDate: "2025-01-20",
+      endDate: "2025-02-20",
+      startingBid: 450000,
+      currentBid: 520000,
+      status: "Em Andamento",
+      category: "Imóveis",
+      images: ["/placeholder.svg"],
+      bidsCount: 15,
+      createdAt: "2025-01-10"
     },
     {
       id: 2,
-      title: "Leilão de Imóveis - Rio de Janeiro",
-      description: "Apartamentos, casas e terrenos em diversas regiões do Rio de Janeiro.",
-      date: "2025-01-20",
-      time: "10:00",
-      location: "Rio de Janeiro - RJ",
-      status: "Rascunho",
-      auctioneer: "RJ Leilões",
-      totalLots: 45,
-      estimatedValue: 15000000
+      title: "Apartamento Centro - Rio de Janeiro",
+      description: "Apartamento de 2 quartos no centro histórico",
+      startDate: "2025-01-25",
+      endDate: "2025-02-25",
+      startingBid: 300000,
+      currentBid: 300000,
+      status: "Publicado",
+      category: "Imóveis",
+      images: ["/placeholder.svg"],
+      bidsCount: 0,
+      createdAt: "2025-01-12"
     }
   ]);
 
@@ -59,12 +66,11 @@ export const AuctionManagement = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    date: "",
-    time: "",
-    location: "",
-    status: "Rascunho" as const,
-    auctioneer: "",
-    estimatedValue: 0
+    startDate: "",
+    endDate: "",
+    startingBid: 0,
+    category: "",
+    status: "Rascunho" as const
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -73,7 +79,10 @@ export const AuctionManagement = () => {
     if (editingAuction) {
       setAuctions(prev => prev.map(auction => 
         auction.id === editingAuction.id 
-          ? { ...auction, ...formData, totalLots: auction.totalLots }
+          ? { 
+              ...auction, 
+              ...formData
+            }
           : auction
       ));
       toast({ title: "Leilão atualizado com sucesso!" });
@@ -81,7 +90,10 @@ export const AuctionManagement = () => {
       const newAuction: Auction = {
         id: Date.now(),
         ...formData,
-        totalLots: 0
+        currentBid: formData.startingBid,
+        images: ["/placeholder.svg"],
+        bidsCount: 0,
+        createdAt: new Date().toISOString().split('T')[0]
       };
       setAuctions(prev => [...prev, newAuction]);
       toast({ title: "Leilão criado com sucesso!" });
@@ -92,12 +104,11 @@ export const AuctionManagement = () => {
     setFormData({
       title: "",
       description: "",
-      date: "",
-      time: "",
-      location: "",
-      status: "Rascunho",
-      auctioneer: "",
-      estimatedValue: 0
+      startDate: "",
+      endDate: "",
+      startingBid: 0,
+      category: "",
+      status: "Rascunho"
     });
   };
 
@@ -106,12 +117,11 @@ export const AuctionManagement = () => {
     setFormData({
       title: auction.title,
       description: auction.description,
-      date: auction.date,
-      time: auction.time,
-      location: auction.location,
-      status: auction.status,
-      auctioneer: auction.auctioneer,
-      estimatedValue: auction.estimatedValue
+      startDate: auction.startDate,
+      endDate: auction.endDate,
+      startingBid: auction.startingBid,
+      category: auction.category,
+      status: auction.status
     });
     setIsDialogOpen(true);
   };
@@ -123,10 +133,11 @@ export const AuctionManagement = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Publicado": return "bg-green-500";
-      case "Em Andamento": return "bg-blue-500";
-      case "Finalizado": return "bg-gray-500";
-      default: return "bg-yellow-500";
+      case "Rascunho": return "bg-gray-500";
+      case "Publicado": return "bg-blue-500";
+      case "Em Andamento": return "bg-green-500";
+      case "Finalizado": return "bg-red-500";
+      default: return "bg-gray-500";
     }
   };
 
@@ -135,7 +146,7 @@ export const AuctionManagement = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Gerenciar Leilões</h2>
-          <p className="text-gray-600">Cadastre e gerencie todos os leilões da plataforma</p>
+          <p className="text-gray-600">Controle todos os leilões da plataforma</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -151,7 +162,7 @@ export const AuctionManagement = () => {
                 {editingAuction ? "Editar Leilão" : "Criar Novo Leilão"}
               </DialogTitle>
               <DialogDescription>
-                Preencha as informações do leilão abaixo.
+                Configure as informações do leilão abaixo.
               </DialogDescription>
             </DialogHeader>
             
@@ -163,7 +174,7 @@ export const AuctionManagement = () => {
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Ex: Leilão de Veículos - São Paulo"
+                    placeholder="Ex: Casa em Condomínio - São Paulo"
                     required
                   />
                 </div>
@@ -174,47 +185,61 @@ export const AuctionManagement = () => {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Descreva o leilão..."
+                    placeholder="Descreva o item do leilão..."
+                    rows={3}
                     required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="date">Data</Label>
+                  <Label htmlFor="category">Categoria</Label>
                   <Input
-                    id="date"
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    placeholder="Ex: Imóveis, Veículos, Arte"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="startingBid">Lance Inicial (R$)</Label>
+                  <Input
+                    id="startingBid"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.startingBid}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startingBid: Number(e.target.value) }))}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="startDate">Data de Início</Label>
+                  <Input
+                    id="startDate"
                     type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                    value={formData.startDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
                     required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="time">Horário</Label>
+                  <Label htmlFor="endDate">Data de Término</Label>
                   <Input
-                    id="time"
-                    type="time"
-                    value={formData.time}
-                    onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                    id="endDate"
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
                     required
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="location">Local</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="Ex: São Paulo - SP"
-                    required
-                  />
-                </div>
-                
-                <div>
+                <div className="col-span-2">
                   <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value: any) => setFormData(prev => ({ ...prev, status: value }))}>
+                  <Select value={formData.status} onValueChange={(value: "Rascunho" | "Publicado" | "Em Andamento" | "Finalizado") => setFormData(prev => ({ ...prev, status: value }))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -225,29 +250,6 @@ export const AuctionManagement = () => {
                       <SelectItem value="Finalizado">Finalizado</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="auctioneer">Leiloeiro</Label>
-                  <Input
-                    id="auctioneer"
-                    value={formData.auctioneer}
-                    onChange={(e) => setFormData(prev => ({ ...prev, auctioneer: e.target.value }))}
-                    placeholder="Nome do leiloeiro"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="estimatedValue">Valor Estimado (R$)</Label>
-                  <Input
-                    id="estimatedValue"
-                    type="number"
-                    value={formData.estimatedValue}
-                    onChange={(e) => setFormData(prev => ({ ...prev, estimatedValue: Number(e.target.value) }))}
-                    placeholder="0"
-                    required
-                  />
                 </div>
               </div>
               
@@ -264,23 +266,65 @@ export const AuctionManagement = () => {
         </Dialog>
       </div>
 
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Total de Leilões</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{auctions.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Em Andamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {auctions.filter(a => a.status === "Em Andamento").length}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Publicados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {auctions.filter(a => a.status === "Publicado").length}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Finalizados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-600">
+              {auctions.filter(a => a.status === "Finalizado").length}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Auctions Table */}
       <Card>
         <CardHeader>
           <CardTitle>Leilões Cadastrados</CardTitle>
           <CardDescription>
-            Total de {auctions.length} leilões cadastrados
+            Gerencie todos os leilões da plataforma
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Data/Hora</TableHead>
-                <TableHead>Local</TableHead>
+                <TableHead>Leilão</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead>Lance Atual</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Lotes</TableHead>
-                <TableHead>Valor Est.</TableHead>
+                <TableHead>Data Término</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -288,23 +332,27 @@ export const AuctionManagement = () => {
               {auctions.map((auction) => (
                 <TableRow key={auction.id}>
                   <TableCell>
-                    <div>
-                      <div className="font-medium">{auction.title}</div>
-                      <div className="text-sm text-gray-500">{auction.auctioneer}</div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-16 h-12 bg-gray-100 rounded overflow-hidden">
+                        <img 
+                          src={auction.images[0]} 
+                          alt={auction.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium">{auction.title}</div>
+                        <div className="text-sm text-gray-500">{auction.description}</div>
+                      </div>
                     </div>
                   </TableCell>
+                  <TableCell>{auction.category}</TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">
-                        {new Date(auction.date).toLocaleDateString('pt-BR')} às {auction.time}
-                      </span>
+                    <div className="font-bold text-green-600">
+                      R$ {auction.currentBid.toLocaleString()}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">{auction.location}</span>
+                    <div className="text-sm text-gray-500">
+                      {auction.bidsCount} lances
                     </div>
                   </TableCell>
                   <TableCell>
@@ -312,9 +360,8 @@ export const AuctionManagement = () => {
                       {auction.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{auction.totalLots}</TableCell>
                   <TableCell>
-                    R$ {auction.estimatedValue.toLocaleString('pt-BR')}
+                    {new Date(auction.endDate).toLocaleDateString('pt-BR')}
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
