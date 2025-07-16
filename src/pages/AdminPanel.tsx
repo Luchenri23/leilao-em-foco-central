@@ -9,6 +9,7 @@ import { BannerManagementFull } from "@/components/BannerManagementFull";
 import { AdminConfigForm } from "@/components/AdminConfigForm";
 import { AdminChat } from "@/components/AdminChat";
 import { ReportsSection } from "@/components/ReportsSection";
+import { AdminManagement } from "@/components/AdminManagement";
 import { 
   Users, 
   Gavel, 
@@ -17,7 +18,8 @@ import {
   Settings, 
   MessageSquare, 
   BarChart3,
-  Home
+  Home,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -33,6 +35,7 @@ const AdminPanel = () => {
     { id: "banners", label: "Banners", icon: Image },
     { id: "chat", label: "Chat", icon: MessageSquare },
     { id: "reports", label: "Relatórios", icon: BarChart3 },
+    { id: "admins", label: "Administradores", icon: Shield },
     { id: "settings", label: "Configurações", icon: Settings },
   ];
 
@@ -52,6 +55,8 @@ const AdminPanel = () => {
         return <AdminChat />;
       case "reports":
         return <ReportsSection />;
+      case "admins":
+        return <AdminManagement />;
       case "settings":
         return <AdminConfigForm />;
       default:
