@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 
 const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [pendingUsers, setPendingUsers] = useState([]);
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: Home },
@@ -38,9 +39,9 @@ const AdminPanel = () => {
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
-        return <AdminStats />;
+        return <AdminStats pendingUsersCount={pendingUsers.length} />;
       case "users":
-        return <UserManagement pendingUsers={[]} setPendingUsers={() => {}} />;
+        return <UserManagement pendingUsers={pendingUsers} setPendingUsers={setPendingUsers} />;
       case "auctions":
         return <AuctionManagement />;
       case "content":
@@ -54,7 +55,7 @@ const AdminPanel = () => {
       case "settings":
         return <AdminConfigForm />;
       default:
-        return <AdminStats />;
+        return <AdminStats pendingUsersCount={pendingUsers.length} />;
     }
   };
 
