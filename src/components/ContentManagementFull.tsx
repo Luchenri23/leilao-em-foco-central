@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit2, Trash2, Eye, FileText, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { FileText, Plus, Search, Edit, Trash2, Eye, Calendar, Users } from "lucide-react";
+
+type ContentType = "Página" | "Notícia" | "Edital";
+type ContentStatus = "Rascunho" | "Publicado";
 
 interface Content {
   id: number;
@@ -19,113 +19,128 @@ interface Content {
   slug: string;
   content: string;
   excerpt: string;
-  type: "Página" | "Notícia" | "Edital";
-  status: "Rascunho" | "Publicado";
+  type: ContentType;
+  status: ContentStatus;
   publishDate: string;
-  author: string;
   seoTitle: string;
   seoDescription: string;
   featuredImage: string;
-  createdAt: string;
-  updatedAt: string;
+  views?: number;
 }
 
 export const ContentManagementFull = () => {
   const { toast } = useToast();
-  const [contents, setContents] = useState<Content[]>([
-    {
-      id: 1,
-      title: "Como Participar de Leilões Online",
-      slug: "como-participar-leiloes-online",
-      content: "Guia completo sobre como participar de leilões online...",
-      excerpt: "Aprenda o passo a passo para participar de leilões online",
-      type: "Página",
-      status: "Publicado",
-      publishDate: "2025-01-10",
-      author: "Admin",
-      seoTitle: "Como Participar de Leilões Online - Guia Completo",
-      seoDescription: "Guia completo para participar de leilões online com segurança",
-      featuredImage: "/placeholder.svg",
-      createdAt: "2025-01-10",
-      updatedAt: "2025-01-12"
-    },
-    {
-      id: 2,
-      title: "Edital - Leilão de Imóveis Janeiro 2025",
-      slug: "edital-leilao-imoveis-janeiro-2025",
-      content: "Edital oficial do leilão de imóveis...",
-      excerpt: "Confira o edital completo do leilão de imóveis",
-      type: "Edital",
-      status: "Publicado",
-      publishDate: "2025-01-15",
-      author: "Admin",
-      seoTitle: "Edital Leilão de Imóveis Janeiro 2025",
-      seoDescription: "Edital oficial do leilão de imóveis de janeiro 2025",
-      featuredImage: "/placeholder.svg",
-      createdAt: "2025-01-08",
-      updatedAt: "2025-01-08"
-    }
-  ]);
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingContent, setEditingContent] = useState<Content | null>(null);
-  const [formData, setFormData] = useState({
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  
+  const [newContent, setNewContent] = useState<{
+    title: string;
+    slug: string;
+    content: string;
+    excerpt: string;
+    type: ContentType;
+    status: ContentStatus;
+    publishDate: string;
+    seoTitle: string;
+    seoDescription: string;
+    featuredImage: string;
+  }>({
     title: "",
     slug: "",
     content: "",
     excerpt: "",
-    type: "Página" as const,
-    status: "Rascunho" as const,
+    type: "Página",
+    status: "Rascunho",
     publishDate: "",
     seoTitle: "",
     seoDescription: "",
     featuredImage: ""
   });
 
+  const [contents, setContents] = useState<Content[]>([
+    {
+      id: 1,
+      title: "Sobre Nossa Empresa",
+      slug: "sobre-nos",
+      content: "Conteúdo da página sobre nós...",
+      excerpt: "Conheça nossa história e missão",
+      type: "Página",
+      status: "Publicado",
+      publishDate: "2025-01-15",
+      seoTitle: "Sobre Nós - Leilão em Foco",
+      seoDescription: "Conheça a história e missão da Leilão em Foco",
+      featuredImage: "",
+      views: 145
+    },
+    {
+      id: 2,
+      title: "Novo Leilão de Veículos Disponível",
+      slug: "novo-leilao-veiculos-janeiro-2025",
+      content: "Detalhes sobre o novo leilão de veículos...",
+      excerpt: "Confira os veículos disponíveis no leilão deste mês",
+      type: "Notícia",
+      status: "Publicado",
+      publishDate: "2025-01-16",
+      seoTitle: "Leilão de Veículos Janeiro 2025",
+      seoDescription: "Participe do leilão de veículos com as melhores oportunidades",
+      featuredImage: "",
+      views: 89
+    },
+    {
+      id: 3,
+      title: "Edital Leilão Imóveis Comerciais",
+      slug: "edital-imoveis-comerciais-sp",
+      content: "Texto completo do edital...",
+      excerpt: "Edital para leilão de imóveis comerciais em São Paulo",
+      type: "Edital",
+      status: "Rascunho",
+      publishDate: "2025-01-20",
+      seoTitle: "Edital Imóveis Comerciais SP",
+      seoDescription: "Edital oficial para leilão de imóveis comerciais",
+      featuredImage: "",
+      views: 0
+    }
+  ]);
+
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
       .trim();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const slug = formData.slug || generateSlug(formData.title);
-    
-    if (editingContent) {
-      setContents(prev => prev.map(content => 
-        content.id === editingContent.id 
-          ? { 
-              ...content, 
-              ...formData,
-              slug,
-              updatedAt: new Date().toISOString().split('T')[0]
-            }
-          : content
-      ));
-      toast({ title: "Conteúdo atualizado com sucesso!" });
-    } else {
-      const newContent: Content = {
-        id: Date.now(),
-        ...formData,
-        slug,
-        author: "Admin",
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
-      setContents(prev => [...prev, newContent]);
-      toast({ title: "Conteúdo criado com sucesso!" });
+  const handleTitleChange = (title: string) => {
+    setNewContent({
+      ...newContent,
+      title,
+      slug: generateSlug(title),
+      seoTitle: title
+    });
+  };
+
+  const handleCreateContent = () => {
+    if (!newContent.title || !newContent.content) {
+      toast({
+        title: "Erro",
+        description: "Preencha pelo menos o título e o conteúdo",
+        variant: "destructive"
+      });
+      return;
     }
 
-    setIsDialogOpen(false);
-    setEditingContent(null);
-    setFormData({
+    const content: Content = {
+      id: contents.length + 1,
+      ...newContent,
+      views: 0
+    };
+
+    setContents([...contents, content]);
+    setNewContent({
       title: "",
       slug: "",
       content: "",
@@ -137,314 +152,363 @@ export const ContentManagementFull = () => {
       seoDescription: "",
       featuredImage: ""
     });
-  };
 
-  const handleEdit = (content: Content) => {
-    setEditingContent(content);
-    setFormData({
-      title: content.title,
-      slug: content.slug,
-      content: content.content,
-      excerpt: content.excerpt,
-      type: content.type,
-      status: content.status,
-      publishDate: content.publishDate,
-      seoTitle: content.seoTitle,
-      seoDescription: content.seoDescription,
-      featuredImage: content.featuredImage
+    toast({
+      title: "Conteúdo criado!",
+      description: "O conteúdo foi criado com sucesso."
     });
-    setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setContents(prev => prev.filter(content => content.id !== id));
-    toast({ title: "Conteúdo removido com sucesso!" });
+  const handleTypeChange = (type: ContentType) => {
+    setNewContent({...newContent, type});
   };
 
-  const getTypeColor = (type: string) => {
+  const handleStatusChange = (id: number, newStatus: ContentStatus) => {
+    setContents(contents.map(content => 
+      content.id === id ? { ...content, status: newStatus } : content
+    ));
+    
+    toast({
+      title: "Status atualizado!",
+      description: `Conteúdo alterado para ${newStatus}.`
+    });
+  };
+
+  const handleDeleteContent = (id: number) => {
+    setContents(contents.filter(content => content.id !== id));
+    toast({
+      title: "Conteúdo removido!",
+      description: "O conteúdo foi removido com sucesso."
+    });
+  };
+
+  const getTypeColor = (type: ContentType) => {
     switch (type) {
       case "Página": return "bg-blue-500";
       case "Notícia": return "bg-green-500";
-      case "Edital": return "bg-orange-500";
+      case "Edital": return "bg-purple-500";
       default: return "bg-gray-500";
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ContentStatus) => {
     switch (status) {
-      case "Publicado": return "bg-green-500";
       case "Rascunho": return "bg-gray-500";
+      case "Publicado": return "bg-green-500";
       default: return "bg-gray-500";
     }
   };
+
+  const filteredContents = contents.filter(content => {
+    const matchesSearch = content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         content.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === "all" || content.type === selectedType;
+    const matchesStatus = selectedStatus === "all" || content.status === selectedStatus;
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Gerenciar Conteúdo</h2>
-          <p className="text-gray-600">Gerencie páginas, notícias e editais do site</p>
-        </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Conteúdo
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingContent ? "Editar Conteúdo" : "Criar Novo Conteúdo"}
-              </DialogTitle>
-              <DialogDescription>
-                Configure as informações do conteúdo abaixo.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <Label htmlFor="title">Título</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => {
-                      const title = e.target.value;
-                      setFormData(prev => ({ 
-                        ...prev, 
-                        title,
-                        slug: generateSlug(title),
-                        seoTitle: title
-                      }));
-                    }}
-                    placeholder="Digite o título do conteúdo"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="slug">Slug (URL)</Label>
-                  <Input
-                    id="slug"
-                    value={formData.slug}
-                    onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="url-do-conteudo"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="type">Tipo de Conteúdo</Label>
-                  <Select value={formData.type} onValueChange={(value: "Página" | "Notícia" | "Edital") => setFormData(prev => ({ ...prev, type: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Página">Página</SelectItem>
-                      <SelectItem value="Notícia">Notícia</SelectItem>
-                      <SelectItem value="Edital">Edital</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value: "Rascunho" | "Publicado") => setFormData(prev => ({ ...prev, status: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Rascunho">Rascunho</SelectItem>
-                      <SelectItem value="Publicado">Publicado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="publishDate">Data de Publicação</Label>
-                  <Input
-                    id="publishDate"
-                    type="date"
-                    value={formData.publishDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, publishDate: e.target.value }))}
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="excerpt">Resumo</Label>
-                  <Textarea
-                    id="excerpt"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                    placeholder="Breve descrição do conteúdo..."
-                    rows={2}
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="content">Conteúdo</Label>
-                  <Textarea
-                    id="content"
-                    value={formData.content}
-                    onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                    placeholder="Digite o conteúdo completo..."
-                    rows={8}
-                    required
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="featuredImage">Imagem Destacada (URL)</Label>
-                  <Input
-                    id="featuredImage"
-                    value={formData.featuredImage}
-                    onChange={(e) => setFormData(prev => ({ ...prev, featuredImage: e.target.value }))}
-                    placeholder="URL da imagem destacada"
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="seoTitle">Título SEO</Label>
-                  <Input
-                    id="seoTitle"
-                    value={formData.seoTitle}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
-                    placeholder="Título otimizado para SEO"
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <Label htmlFor="seoDescription">Descrição SEO</Label>
-                  <Textarea
-                    id="seoDescription"
-                    value={formData.seoDescription}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
-                    placeholder="Descrição otimizada para SEO (máx. 160 caracteres)"
-                    rows={2}
-                    maxLength={160}
-                  />
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit">
-                  {editingContent ? "Atualizar" : "Criar"} Conteúdo
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Statistics Cards */}
+      {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Total de Conteúdos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{contents.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Publicados</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {contents.filter(c => c.status === "Publicado").length}
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total de Conteúdos</p>
+                <p className="text-2xl font-bold">{contents.length}</p>
+              </div>
+              <FileText className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
+
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Rascunhos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-600">
-              {contents.filter(c => c.status === "Rascunho").length}
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Publicados</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {contents.filter(c => c.status === "Publicado").length}
+                </p>
+              </div>
+              <Eye className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
+
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Páginas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {contents.filter(c => c.type === "Página").length}
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Rascunhos</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {contents.filter(c => c.status === "Rascunho").length}
+                </p>
+              </div>
+              <Edit className="h-8 w-8 text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total de Visualizações</p>
+                <p className="text-2xl font-bold">
+                  {contents.reduce((total, content) => total + (content.views || 0), 0)}
+                </p>
+              </div>
+              <Users className="h-8 w-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Content Table */}
+      {/* Formulário de Novo Conteúdo */}
       <Card>
         <CardHeader>
-          <CardTitle>Conteúdos Cadastrados</CardTitle>
-          <CardDescription>
-            Gerencie todos os conteúdos do site
-          </CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Criar Novo Conteúdo
+          </CardTitle>
+          <CardDescription>Adicione páginas, notícias ou editais</CardDescription>
         </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="title">Título</Label>
+              <Input
+                id="title"
+                value={newContent.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="Digite o título do conteúdo"
+              />
+            </div>
+            <div>
+              <Label htmlFor="slug">Slug (URL)</Label>
+              <Input
+                id="slug"
+                value={newContent.slug}
+                onChange={(e) => setNewContent({...newContent, slug: e.target.value})}
+                placeholder="slug-da-url"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="type">Tipo de Conteúdo</Label>
+              <Select value={newContent.type} onValueChange={handleTypeChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Página">Página</SelectItem>
+                  <SelectItem value="Notícia">Notícia</SelectItem>
+                  <SelectItem value="Edital">Edital</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select value={newContent.status} onValueChange={(value: ContentStatus) => setNewContent({...newContent, status: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Rascunho">Rascunho</SelectItem>
+                  <SelectItem value="Publicado">Publicado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="publishDate">Data de Publicação</Label>
+              <Input
+                id="publishDate"
+                type="date"
+                value={newContent.publishDate}
+                onChange={(e) => setNewContent({...newContent, publishDate: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="excerpt">Resumo/Excerpt</Label>
+            <Textarea
+              id="excerpt"
+              value={newContent.excerpt}
+              onChange={(e) => setNewContent({...newContent, excerpt: e.target.value})}
+              placeholder="Breve descrição do conteúdo"
+              rows={2}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="content">Conteúdo Principal</Label>
+            <Textarea
+              id="content"
+              value={newContent.content}
+              onChange={(e) => setNewContent({...newContent, content: e.target.value})}
+              placeholder="Digite o conteúdo completo aqui..."
+              rows={6}
+            />
+          </div>
+
+          {/* SEO Fields */}
+          <div className="border-t pt-4">
+            <h4 className="font-medium mb-3">Configurações de SEO</h4>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="seoTitle">Título SEO</Label>
+                <Input
+                  id="seoTitle"
+                  value={newContent.seoTitle}
+                  onChange={(e) => setNewContent({...newContent, seoTitle: e.target.value})}
+                  placeholder="Título otimizado para SEO"
+                />
+              </div>
+              <div>
+                <Label htmlFor="seoDescription">Descrição SEO</Label>
+                <Textarea
+                  id="seoDescription"
+                  value={newContent.seoDescription}
+                  onChange={(e) => setNewContent({...newContent, seoDescription: e.target.value})}
+                  placeholder="Descrição para mecanismos de busca"
+                  rows={2}
+                />
+              </div>
+              <div>
+                <Label htmlFor="featuredImage">URL da Imagem Destacada</Label>
+                <Input
+                  id="featuredImage"
+                  value={newContent.featuredImage}
+                  onChange={(e) => setNewContent({...newContent, featuredImage: e.target.value})}
+                  placeholder="https://exemplo.com/imagem.jpg"
+                />
+              </div>
+            </div>
+          </div>
+
+          <Button onClick={handleCreateContent} className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Criar Conteúdo
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Lista de Conteúdos */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Gerenciar Conteúdos</CardTitle>
+          <CardDescription>Visualize e gerencie todos os conteúdos do site</CardDescription>
+          
+          {/* Filtros */}
+          <div className="flex flex-col lg:flex-row gap-4 mt-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar conteúdos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-full lg:w-48">
+                <SelectValue placeholder="Filtrar por tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Tipos</SelectItem>
+                <SelectItem value="Página">Páginas</SelectItem>
+                <SelectItem value="Notícia">Notícias</SelectItem>
+                <SelectItem value="Edital">Editais</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-full lg:w-48">
+                <SelectValue placeholder="Filtrar por status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="Rascunho">Rascunhos</SelectItem>
+                <SelectItem value="Publicado">Publicados</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Conteúdo</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Data Publicação</TableHead>
-                <TableHead>Atualizado</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contents.map((content) => (
-                <TableRow key={content.id}>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium">{content.title}</div>
-                      <div className="text-sm text-gray-500">/{content.slug}</div>
-                      <div className="text-sm text-gray-400">{content.excerpt}</div>
+          <div className="space-y-4">
+            {filteredContents.map((content) => (
+              <div key={content.id} className="border rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg">{content.title}</h3>
+                    <p className="text-gray-600 text-sm">{content.excerpt}</p>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <span>Slug: /{content.slug}</span>
+                      <span>Visualizações: {content.views || 0}</span>
+                      <span>Publicado em: {new Date(content.publishDate).toLocaleDateString()}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getTypeColor(content.type)}>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className={`${getTypeColor(content.type)} text-white`}>
                       {content.type}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(content.status)}>
+                    <Badge className={`${getStatusColor(content.status)} text-white`}>
                       {content.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {content.publishDate ? new Date(content.publishDate).toLocaleDateString('pt-BR') : '-'}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(content.updatedAt).toLocaleDateString('pt-BR')}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(content)}>
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDelete(content.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <div className="text-sm text-gray-500">
+                    SEO: {content.seoTitle || 'Não configurado'}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Select 
+                      value={content.status} 
+                      onValueChange={(value: ContentStatus) => handleStatusChange(content.id, value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Rascunho">Rascunho</SelectItem>
+                        <SelectItem value="Publicado">Publicado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button variant="outline" size="sm">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button variant="outline" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDeleteContent(content.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {filteredContents.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                Nenhum conteúdo encontrado com os filtros aplicados.
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -8,6 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Image, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
+// Ícone do TikTok (usando SVG customizado)
+const TikTokIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43V7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.43z"/>
+  </svg>
+);
+
 export const AdminConfigForm = () => {
   const { toast } = useToast();
   const [config, setConfig] = useState({
@@ -25,11 +32,13 @@ export const AdminConfigForm = () => {
     instagramUrl: "https://instagram.com/leilaoemfoco",
     linkedinUrl: "https://linkedin.com/company/leilaoemfoco",
     twitterUrl: "https://twitter.com/leilaoemfoco",
+    tiktokUrl: "https://tiktok.com/@leilaoemfoco",
     socialMediaEnabled: {
       facebook: true,
       instagram: true,
       linkedin: true,
-      twitter: false
+      twitter: false,
+      tiktok: true
     }
   });
 
@@ -166,6 +175,11 @@ export const AdminConfigForm = () => {
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               <Image className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-sm text-gray-600 mb-4">Clique para enviar uma nova imagem do banner</p>
+              <div className="mb-4 text-xs text-gray-500 space-y-1">
+                <p><strong>Dimensões recomendadas:</strong> 1920x600px</p>
+                <p><strong>Tamanho máximo:</strong> 2MB</p>
+                <p><strong>Formatos aceitos:</strong> JPG, PNG, WebP</p>
+              </div>
               <Button onClick={handleBannerUpload} variant="outline">
                 <Upload className="h-4 w-4 mr-2" />
                 Fazer Upload
@@ -222,6 +236,30 @@ export const AdminConfigForm = () => {
                   value={config.instagramUrl}
                   onChange={(e) => setConfig({...config, instagramUrl: e.target.value})}
                   disabled={!config.socialMediaEnabled.instagram}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="tiktok-enabled"
+                  checked={config.socialMediaEnabled.tiktok}
+                  onChange={() => toggleSocialMedia('tiktok')}
+                  className="rounded"
+                />
+                <div className="text-black">
+                  <TikTokIcon />
+                </div>
+                <Label htmlFor="tiktok-enabled">TikTok</Label>
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="https://tiktok.com/@sua-empresa"
+                  value={config.tiktokUrl}
+                  onChange={(e) => setConfig({...config, tiktokUrl: e.target.value})}
+                  disabled={!config.socialMediaEnabled.tiktok}
                 />
               </div>
             </div>

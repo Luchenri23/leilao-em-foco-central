@@ -38,7 +38,7 @@ const AdminPanel = () => {
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
-        return <AdminStats pendingUsersCount={5} />;
+        return <AdminStats />;
       case "users":
         return <UserManagement pendingUsers={[]} setPendingUsers={() => {}} />;
       case "auctions":
@@ -50,11 +50,11 @@ const AdminPanel = () => {
       case "chat":
         return <AdminChat />;
       case "reports":
-        return <ReportsSection pendingUsersCount={5} />;
+        return <ReportsSection />;
       case "settings":
         return <AdminConfigForm />;
       default:
-        return <AdminStats pendingUsersCount={5} />;
+        return <AdminStats />;
     }
   };
 
