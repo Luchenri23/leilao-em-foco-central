@@ -164,7 +164,7 @@ const Leiloes = () => {
                   <Button variant="secondary" className="bg-white text-primary-blue hover:bg-gray-100">
                     Criar Conta
                   </Button>
-                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary-blue">
+                  <Button variant="outline" className="border-white text-white bg-transparent hover:bg-white hover:text-primary-blue">
                     Saiba Mais
                   </Button>
                 </div>
