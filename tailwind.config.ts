@@ -63,12 +63,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Logo colors
-				'primary-blue': '#0097b2',
-				'secondary-blue': '#0cc0df',
-				'orange': '#ff914d',
-				'neutral-black': '#000000',
-				'neutral-gray': '#545454'
+				// Leilão em Foco brand colors
+				leilao: {
+					azul: 'hsl(var(--leilao-azul))',
+					'azul-claro': 'hsl(var(--leilao-azul-claro))',
+					laranja: 'hsl(var(--leilao-laranja))',
+					preto: 'hsl(var(--leilao-preto))',
+					cinza: 'hsl(var(--leilao-cinza))'
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
