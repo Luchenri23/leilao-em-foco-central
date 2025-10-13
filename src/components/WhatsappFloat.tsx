@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export const WhatsappFloat = () => {
   const handleWhatsappClick = () => {
-    // Substitua pelo seu número do WhatsApp
-    const phoneNumber = "5511999999999";
+    const phoneNumber = "5511966179980";
     const message = "Olá! Gostaria de saber mais sobre os serviços do Leilão em Foco.";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");

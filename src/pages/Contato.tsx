@@ -57,7 +57,7 @@ const Contato = () => {
                     <Phone className="h-5 w-5 text-primary-blue mt-1" />
                     <div>
                       <p className="font-medium">Telefone</p>
-                      <p className="text-sm text-gray-600">(11) 9999-9999</p>
+                      <p className="text-sm text-gray-600">11 96617-9980</p>
                     </div>
                   </div>
                   
@@ -65,7 +65,7 @@ const Contato = () => {
                     <MessageCircle className="h-5 w-5 text-primary-blue mt-1" />
                     <div>
                       <p className="font-medium">WhatsApp</p>
-                      <p className="text-sm text-gray-600">(11) 9999-9999</p>
+                      <p className="text-sm text-gray-600">11 96617-9980</p>
                     </div>
                   </div>
                   

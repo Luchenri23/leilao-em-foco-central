@@ -89,7 +89,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-cyan-400" />
-                <span className="text-gray-300 text-sm">(11) 9999-9999</span>
+                <span className="text-gray-300 text-sm">11 96617-9980</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-cyan-400" />
